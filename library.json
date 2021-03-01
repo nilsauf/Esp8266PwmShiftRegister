@@ -18,6 +18,10 @@
         {
             "name": "FastEsp8266ShiftRegister",
             "version": "^0.1.0"
+        },
+        {
+            "name": "ESP8266TimerInterrupt",
+            "version": "1.0.3"
         }
     ],
     "homepage": "https://github.com/nilsauf/Esp8266PwmShiftRegister",
