@@ -94,4 +94,3 @@ private:
 Esp8266PwmShiftRegister *Esp8266PwmShiftRegister::singleton = NULL;
 
 #endif
-#endif
