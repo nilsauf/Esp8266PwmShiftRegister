@@ -12,6 +12,11 @@
 class Esp8266PwmShiftRegister
 {
 public:
+    Esp8266PwmShiftRegister(const uint8_t dataPin, const uint8_t clockPin, const uint8_t latchPin, const uint8_t shiftRegisterCount = 1, const uint8_t resolution = 255)
+        : Esp8266PwmShiftRegister(new FastEsp8266ShiftRegister(dataPin, clockPin, latchPin, shiftRegisterCount), resolution)
+    {
+    }
+
     Esp8266PwmShiftRegister(FastEsp8266ShiftRegister *shiftRegister, const uint8_t resolution = 255)
     {
         this->_shiftRegister = shiftRegister;
