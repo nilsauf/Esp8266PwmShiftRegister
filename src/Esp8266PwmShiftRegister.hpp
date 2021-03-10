@@ -54,6 +54,22 @@ public:
         }
     };
 
+    /**
+     * @brief Swaps the current data array to another array of the same size
+     * 
+     * @param newDataArray The pointer to a new data array, size needs to be resolution * shiftRegisterCount * sizeof(uint8_t) (see constructor arguments)
+     * @return uint8_t* The pointer to the current data array (can be swaped back)
+     */
+    uint8_t *SwapDataArray(uint8_t *newDataArray)
+    {
+        noInterrupts();
+        uint8_t *oldDataArray = this->data;
+        this->data = newDataArray;
+        time = 0;
+        interrupts();
+        return oldDataArray;
+    }
+
     void update()
     {
         // higher performance for single shift register mode
