@@ -12,28 +12,28 @@
 class Esp8266PwmShiftRegister
 {
 public:
-    Esp8266PwmShiftRegister(const uint8_t dataPin, const uint8_t clockPin, const uint8_t latchPin, const uint8_t shiftRegisterCount = 1, const uint8_t resolution = 255)
+    Esp8266PwmShiftRegister(FastEsp8266ShiftRegister *shiftRegister, const uint8_t resolution = 255)
     {
-        this->_shiftRegister = new FastEsp8266ShiftRegister(dataPin, clockPin, latchPin, shiftRegisterCount);
+        this->_shiftRegister = shiftRegister;
         this->_resolution = resolution;
-        this->_shiftRegisterCount = shiftRegisterCount;
+        this->_shiftRegisterCount = this->_shiftRegister->GetRegisterCount();
 
         // init data
         // internally a two-dimensional array: first dimension time, second dimension shift register bytes
         // data[t + sr * resolution]
-        this->data = (uint8_t *)malloc(resolution * shiftRegisterCount * sizeof(uint8_t));
-        for (int t = 0; t < resolution; ++t)
+        this->data = (uint8_t *)malloc(this->_resolution * this->_shiftRegisterCount * sizeof(uint8_t));
+        for (int t = 0; t < this->_resolution; ++t)
         {
-            for (int i = 0; i < shiftRegisterCount; ++i)
+            for (int i = 0; i < this->_shiftRegisterCount; ++i)
             {
-                this->data[t + i * resolution] = 0;
+                this->data[t + i * this->_resolution] = 0;
             }
         }
 
         Esp8266PwmShiftRegister::singleton = this; // make this object accessible for timer interrupts
 
         // the boolean will be used to increase the performance in other functions
-        this->singleShiftRegister = (shiftRegisterCount == 1);
+        this->singleShiftRegister = (this->_shiftRegisterCount == 1);
 
         this->ITimer = ESP8266Timer();
     }
