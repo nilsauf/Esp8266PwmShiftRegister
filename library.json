@@ -14,16 +14,10 @@
             "maintainer": true
         }
     ],
-    "dependencies": [
-        {
-            "name": "FastEsp8266ShiftRegister",
-            "version": "^0.2.0"
-        },
-        {
-            "name": "ESP8266TimerInterrupt",
-            "version": "1.0.3"
-        }
-    ],
+    "dependencies": {
+        "nilsauf/FastEsp8266ShiftRegister": "^0.2.1",
+        "khoih.prog/ESP8266TimerInterrupt": "^1.4.0"
+    },
     "homepage": "https://github.com/nilsauf/Esp8266PwmShiftRegister",
     "frameworks": "*",
     "platforms": "esp8266"
