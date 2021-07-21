@@ -6,7 +6,7 @@
 Esp8266PwmShiftRegister shiftRegister(13, 14, 15, SHIFT_COUNT, 255);
 
 // Timer callback to trigger the update of the pwm shift register
-void ICACHE_RAM_ATTR timerUpdate(void)
+void IRAM_ATTR timerUpdate(void)
 {
     noInterrupts();
     Esp8266PwmShiftRegister::singleton->update();
