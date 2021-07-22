@@ -6,8 +6,10 @@
 #endif
 
 #include <Arduino.h>
-#include <ESP8266TimerInterrupt.h>
+#include <ESP8266_ISR_Timer.h>
 #include <FastEsp8266ShiftRegister.hpp>
+
+void IRAM_ATTR timerUpdate(void);
 
 class Esp8266PwmShiftRegister
 {
@@ -40,7 +42,7 @@ public:
         // the boolean will be used to increase the performance in other functions
         this->singleShiftRegister = (this->_shiftRegisterCount == 1);
 
-        this->ITimer = ESP8266Timer();
+        this->ISR_Timer = new ISRTimer();
     }
 
     /**
@@ -48,7 +50,7 @@ public:
     * @param pin The index of the pin (starting at 0). If multiple shift registers are chained, the first pin of the second shift register would be addressed with pin = 8.
     * @param value The PWM value (between 0 and 255 as it will be scaled to the resolution that was passed to the constructor). 
     */
-    void set(uint8_t pin, uint8_t value)
+    void IRAM_ATTR set(uint8_t pin, uint8_t value)
     {
         value = (uint8_t)(value / 255.0 * this->_resolution + .5); // round
         uint8_t shiftRegister = pin / 8;
@@ -65,7 +67,7 @@ public:
      * @param newDataArray The pointer to a new data array, size needs to be resolution * shiftRegisterCount * sizeof(uint8_t) (see constructor arguments)
      * @return uint8_t* The pointer to the current data array (can be swaped back)
      */
-    uint8_t *SwapDataArray(uint8_t *newDataArray)
+    uint8_t IRAM_ATTR *SwapDataArray(uint8_t *newDataArray)
     {
         noInterrupts();
         uint8_t *oldDataArray = this->data;
@@ -75,7 +77,10 @@ public:
         return oldDataArray;
     }
 
-    void update()
+    /**
+     * @brief updates the shift register chain to the next values in time
+     */
+    void IRAM_ATTR update()
     {
         // higher performance for single shift register mode
         if (singleShiftRegister)
@@ -97,9 +102,20 @@ public:
         }
     }
 
-    static Esp8266PwmShiftRegister *singleton; // used inside the ISR
-    ESP8266Timer ITimer;
-    const long updateCycleCountInterval = 20;
+    /**
+     * @brief Starts the ISR_Timer of this PwmShftRegister
+     * 
+     * @param updateIntervalMicrosecond The intervall time in microseconds to update the values of the shift register chain
+     * @return true 
+     * @return false 
+     */
+    bool IRAM_ATTR Start(const long updateIntervalMicrosecond = 10)
+    {
+        return this->ISR_Timer->setInterval(clockCyclesPerMicrosecond() * updateIntervalMicrosecond, timerUpdate);
+    }
+
+    static Esp8266PwmShiftRegister IRAM_ATTR *singleton; // used inside the ISR
+    ISRTimer *ISR_Timer;
 
 private:
     FastEsp8266ShiftRegister *_shiftRegister;
@@ -111,7 +127,13 @@ private:
     bool singleShiftRegister; // true if (shiftRegisterCount == 1)
 };
 
+void IRAM_ATTR timerUpdate(void)
+{
+    Esp8266PwmShiftRegister::singleton->update();
+    //Serial.print(".");
+}
+
 // One static reference to the Esp8266PwmShiftRegister that was lastly created. Used for access through timer interrupts.
-Esp8266PwmShiftRegister *Esp8266PwmShiftRegister::singleton = NULL;
+Esp8266PwmShiftRegister IRAM_ATTR *Esp8266PwmShiftRegister::singleton = NULL;
 
 #endif
