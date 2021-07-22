@@ -3,31 +3,32 @@
 
 #define SHIFT_COUNT 1
 
+// create a global shift register object
+// parameters: <number of shift registers> (data pin, clock pin, latch pin)
 Esp8266PwmShiftRegister shiftRegister(13, 14, 15, SHIFT_COUNT, 255);
-
-// Timer callback to trigger the update of the pwm shift register
-void IRAM_ATTR timerUpdate(void)
-{
-    noInterrupts();
-    Esp8266PwmShiftRegister::singleton->update();
-    interrupts();
-}
 
 void setup()
 {
     // put your setup code here, to run once:
 
-    // Attaching the timer interrupt callback
-    Esp8266PwmShiftRegister::singleton->ITimer.attachInterruptInterval(Esp8266PwmShiftRegister::singleton->updateCycleCountInterval, timerUpdate);
+    // Start the register and its timer
+    if (shiftRegister.Start())
+    {
+        Serial.print(F("Starting  shiftRegister OK on millis() = "));
+        Serial.println(millis());
+
+        // Setting the first pin to half brightness
+        shiftRegister.set(0, 125);
+
+        // Setting the second pin to full brightness
+        shiftRegister.set(1, 255);
+    }
 }
 
 void loop()
 {
     // put your main code here, to run repeatedly:
 
-    // Setting the first pin to half brightness
-    shiftRegister.set(0, 125);
-
-    // Setting the second pin to full brightness
-    shiftRegister.set(1, 255);
+    // Run the timer and let it update the register and its chain
+    shiftRegister.Run();
 }
