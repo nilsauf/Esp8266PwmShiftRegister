@@ -78,7 +78,7 @@ public:
     }
 
     /**
-     * @brief updates the shift register chain to the next values in time
+     * @brief updates the shift register chain to the next values in time, executed by the Timer
      */
     void IRAM_ATTR update()
     {
@@ -103,7 +103,7 @@ public:
     }
 
     /**
-     * @brief Starts the ISR_Timer of this PwmShftRegister
+     * @brief Starts the ISR_Timer of this PwmShiftRegister
      * 
      * @param updateIntervalMicrosecond The intervall time in microseconds to update the values of the shift register chain
      * @return true 
@@ -112,6 +112,14 @@ public:
     bool IRAM_ATTR Start(const long updateIntervalMicrosecond = 10)
     {
         return this->ISR_Timer->setInterval(clockCyclesPerMicrosecond() * updateIntervalMicrosecond, timerUpdate);
+    }
+
+    /**
+     * @brief Runs the Timer of this PwmShiftRegister
+     */
+    void IRAM_ATTR Run()
+    {
+        this->ISR_Timer->run();
     }
 
     static Esp8266PwmShiftRegister IRAM_ATTR *singleton; // used inside the ISR
