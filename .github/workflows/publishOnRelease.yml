@@ -50,7 +50,7 @@ jobs:
           value: ${{ secrets.PLATFORMIO_TOKEN }}
           
       - name: Publish Package
-        run: pio package publish --owner ${{ secrets.PLATFORMIO_USERNAME }} --notify
+        run: pio package publish --owner ${{ secrets.PLATFORMIO_USERNAME }} --notify --non-interactive
 
       - name: Commit Version Tag Change
         uses: stefanzweifel/git-auto-commit-action@v4
