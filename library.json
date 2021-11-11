@@ -1,6 +1,6 @@
 {
     "name": "Esp8266PwmShiftRegister",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "description": "A pwm shift register library for the ESP8266 controller",
     "keywords": "shift, register, fast, esp8266, 8266, esp, PWM",
     "repository": {
