@@ -39,7 +39,7 @@ jobs:
       - name: Set new Version
         uses: mingjun97/file-regex-replace@v1
         with:
-         regex: '"version": "VERSION_TAG",'
+         regex: '"version": "\d\.\d\.\d",'
          replacement: '"version": "${{ steps.gettag.outputs.tag }}",'
          include: 'library.json'
           
@@ -51,3 +51,9 @@ jobs:
           
       - name: Publish Package
         run: pio package publish --owner ${{ secrets.PLATFORMIO_USERNAME }} --notify
+
+      - name: Commit Version Tag Change
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Set new Version -> ${{ steps.gettag.outputs.tag }}
+          branch: master
