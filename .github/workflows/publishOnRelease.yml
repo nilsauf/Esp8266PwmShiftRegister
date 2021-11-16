@@ -39,7 +39,7 @@ jobs:
       - name: Set new Version
         uses: mingjun97/file-regex-replace@v1
         with:
-         regex: '"version": "\d\.\d\.\d",'
+         regex: '"version": "\d+\.\d+\.\d+",'
          replacement: '"version": "${{ steps.gettag.outputs.tag }}",'
          include: 'library.json'
           
