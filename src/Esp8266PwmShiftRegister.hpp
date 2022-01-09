@@ -111,7 +111,7 @@ public:
      */
     bool IRAM_ATTR Start(const long updateIntervalMicrosecond = 10)
     {
-        return this->ISR_Timer->setInterval(clockCyclesPerMicrosecond() * updateIntervalMicrosecond, timerUpdate);
+        return this->ISR_Timer->setInterval(clockCyclesPerMicrosecond() * updateIntervalMicrosecond, timerUpdate) != -1;
     }
 
     /**
