@@ -1,0 +1,62 @@
+name: Publish On Master Push
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+          
+      - name: Cache PlatformIO
+        uses: actions/cache@v2
+        with:
+          path: ~/.platformio
+          key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+          
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        
+      - name: Install PlatformIO
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade platformio
+      
+      - name: Get tag
+        id: gettag
+        uses: dawidd6/action-get-tag@v1
+          
+      - name: Set new Version
+        uses: mingjun97/file-regex-replace@v1
+        with:
+         regex: '"version": "\d+\.\d+\.\d+",'
+         replacement: '"version": "${{ steps.gettag.outputs.tag }}",'
+         include: 'library.json'
+          
+      - name: Set Platform IO Login Token
+        uses: myci-actions/export-env-var@1
+        with:
+          name: PLATFORMIO_AUTH_TOKEN
+          value: ${{ secrets.PLATFORMIO_TOKEN }}
+          
+      - name: Publish Package
+        run: pio package publish --owner ${{ secrets.PLATFORMIO_USERNAME }} --notify --non-interactive
+
+      - name: Commit Version Tag Change
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Set new Version -> ${{ steps.gettag.outputs.tag }}
+          branch: master
