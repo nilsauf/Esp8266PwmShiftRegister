@@ -4,17 +4,18 @@
 #define SHIFT_COUNT 1
 
 // create a global shift register object
-// parameters: <number of shift registers> (data pin, clock pin, latch pin)
+// parameters: data pin, clock pin, latch pin, number of shift registers, resolution
 Esp8266PwmShiftRegister shiftRegister(13, 14, 15, SHIFT_COUNT, 255);
 
 void setup()
 {
     // put your setup code here, to run once:
+    Serial.begin(9600);
 
     // Start the register and its timer
     if (shiftRegister.Start())
     {
-        Serial.print(F("Starting  shiftRegister OK on millis() = "));
+        Serial.print(F("Starting shiftRegister on millis() = "));
         Serial.println(millis());
 
         // Setting the first pin to half brightness
@@ -22,6 +23,10 @@ void setup()
 
         // Setting the second pin to full brightness
         shiftRegister.set(1, 255);
+    }
+    else
+    {
+        Serial.print(F("Something went wrong!"));
     }
 }
 
