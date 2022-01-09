@@ -14,11 +14,26 @@ void IRAM_ATTR timerUpdate(void);
 class Esp8266PwmShiftRegister
 {
 public:
+    /**
+    * @brief Construct a new Esp 8266 Pwm Shift Register object
+    * 
+    * @param dataPin The data pin number to use as output
+    * @param clockPin The clock pin number to use as output
+    * @param latchPin The latch pin number to use as output
+    * @param shiftRegisterCount The count of shift registers to use
+    * @param resolution The time resolution to use a finer data array
+    */
     Esp8266PwmShiftRegister(const uint8_t dataPin, const uint8_t clockPin, const uint8_t latchPin, const uint8_t shiftRegisterCount = 1, const uint8_t resolution = 255)
         : Esp8266PwmShiftRegister(new FastEsp8266ShiftRegister(dataPin, clockPin, latchPin, shiftRegisterCount), resolution)
     {
     }
 
+    /**
+     * @brief Construct a new Esp 8266 Pwm Shift Register object
+     * 
+     * @param shiftRegister A fast Esp 8266 Shift Register object pointer
+     * @param resolution The time resolution to use a finer data array
+     */
     Esp8266PwmShiftRegister(FastEsp8266ShiftRegister *shiftRegister, const uint8_t resolution = 255)
     {
         this->_shiftRegister = shiftRegister;
@@ -138,7 +153,6 @@ private:
 void IRAM_ATTR timerUpdate(void)
 {
     Esp8266PwmShiftRegister::singleton->update();
-    //Serial.print(".");
 }
 
 // One static reference to the Esp8266PwmShiftRegister that was lastly created. Used for access through timer interrupts.
